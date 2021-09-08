@@ -31,6 +31,7 @@
 #include "stdio.h"
 #include "internal_flash_test.h"
 #include "modbus_test.h"
+#include "cli_process.h"
 
 /* USER CODE END Includes */
 
@@ -65,11 +66,20 @@ int fputc(int ch, FILE *f)
 {
   /* Place your implementation of fputc here */
   /* e.g. write a character to the EVAL_COM1 and Loop until the end of transmission */
-  HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
+	
+  HAL_UART_Transmit(&DEBUG_PORT_HANDLE, (uint8_t *)&ch, 1, 0xFFFF);
   
   return ch;
 }
 
+int fgetc(FILE *f)
+{
+  uint8_t  ch;
+	
+  HAL_UART_Receive(&DEBUG_PORT_HANDLE,(uint8_t *)&ch, 1, HAL_MAX_DELAY);
+	
+  return  ch;
+}
 /*
  * If add codes below, will do not need to use MicroLIB
 */
@@ -121,6 +131,7 @@ int main(void)
   MX_DMA_Init();
   MX_TIM2_Init();
   MX_USART1_UART_Init();
+	
   MX_USART4_UART_Init();
   MX_I2C1_Init();
   MX_SPI2_Init();
@@ -128,18 +139,24 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	
 	printf("Hello, Thermokon! \r\n\r\n");
-	detect_thermokon_sensor();
-
+	//detect_thermokon_sensor();
+	main_handle_cli();
 	//internal_flash_test();
   
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	//char string[20] ={0};
 	
   while (1)
   {	
-
+/*		
+		printf("***********************\r\n");
+		printf("Please input any words:  \r\n");
+		scanf("%s", string);
+		printf("Inputed:\'%s\'\r\n", string);
+	*/	
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

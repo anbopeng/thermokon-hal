@@ -22,6 +22,20 @@
 
 /* USER CODE BEGIN 0 */
 
+#include <stdarg.h> 
+#include "tiny_vsnprintf.h"
+
+int cliActive = 0 ;
+
+//RX buffer, of size MAX_COMMAND_LENGTH, will be used to read received data from CLI
+volatile static char rx_buffer[RX_BUFFER_LENGTH];
+volatile static int  rx_buffer_read_pos=0;
+volatile static int  rx_buffer_write_pos=0;
+
+volatile static char tx_buffer[TX_BUFFER_LENGTH];
+volatile static int  tx_buffer_read_pos=0;
+volatile static int  tx_buffer_write_pos=0;
+
 /* USER CODE END 0 */
 
 UART_HandleTypeDef hlpuart1;
@@ -174,6 +188,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     GPIO_InitStruct.Alternate = GPIO_AF4_USART1;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+    /* USART1 interrupt Init */
+    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART1_IRQn);
   /* USER CODE BEGIN USART1_MspInit 1 */
 
   /* USER CODE END USART1_MspInit 1 */
@@ -279,6 +296,8 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     */
     HAL_GPIO_DeInit(GPIOA, DEBUG_TX_Pin|DEBUG_RX_Pin);
 
+    /* USART1 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(USART1_IRQn);
   /* USER CODE BEGIN USART1_MspDeInit 1 */
 
   /* USER CODE END USART1_MspDeInit 1 */
@@ -310,6 +329,123 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 }
 
 /* USER CODE BEGIN 1 */
+
+int Debug_cliActive(void)
+{
+	return cliActive;
+}
+
+void Debug_disableCli(int disableRX)
+{
+	if(disableRX)
+	{
+		//disable the uart to change settings
+		//REG_Debug_CR1->UE = 0;
+		__HAL_UART_DISABLE(&DEBUG_PORT_HANDLE);
+		//disable the receive functions
+
+		//REG_Debug_CR1->RXNEIE = 0;
+		__HAL_UART_DISABLE_IT(&DEBUG_PORT_HANDLE, UART_IT_RXNE);
+		
+		//Receive disable
+		//REG_Debug_CR1->RE = 0;
+		
+		//reenable the uart
+		//REG_Debug_CR1->UE = 1;
+		__HAL_UART_ENABLE(&DEBUG_PORT_HANDLE);
+	}
+	cliActive = 0;
+}
+
+char Debug_getChar( void )
+{
+	char c;
+	//clear the new data from the rx buffer
+	if(rx_buffer_read_pos != rx_buffer_write_pos)
+	{
+		c = rx_buffer[rx_buffer_read_pos];
+		
+		rx_buffer_read_pos++;
+		rx_buffer_read_pos = rx_buffer_read_pos % RX_BUFFER_LENGTH;
+	}
+	return c;
+	//Debug_printf("\tRead_pos : %d\r\n\tWrite_pos: %d\r\n", rx_buffer_read_pos, rx_buffer_write_pos);
+}
+
+int Debug_getRxDataLength(void)
+{
+	//we need some logic here for the circular buffer
+	if(rx_buffer_read_pos == rx_buffer_write_pos)
+		return 0;
+	
+	//the write pointer is after the read pointer, we do not need to account
+	//for resetting to the beginning of the array
+	if(rx_buffer_write_pos > rx_buffer_read_pos)
+	{
+		return rx_buffer_write_pos - rx_buffer_read_pos;
+	}
+	
+	//otherwise we need the sum of from read->end and from start->write
+	return RX_BUFFER_LENGTH - rx_buffer_read_pos + rx_buffer_write_pos;
+}
+
+void Debug_AddToWriteBuffer(char* message, int length)
+{
+	while(length)
+	{
+		//reset_watchdog();
+		//add the characters from the message to the buffer
+		tx_buffer[tx_buffer_write_pos] = *message;
+		message++;
+		length --;
+		tx_buffer_write_pos++;
+		tx_buffer_write_pos = tx_buffer_write_pos % TX_BUFFER_LENGTH;
+	}
+	
+	//enable the tx interrupt
+	//REG_Debug_CR1->TXEIE = 1;
+	__HAL_UART_ENABLE_IT(&DEBUG_PORT_HANDLE, UART_IT_TXE);
+
+	
+}
+
+void await_uart_tx(void)
+{
+		//wait for the tx buffer to be empty
+		while(isCharToSend())
+		{
+//				reset_watchdog();
+		}
+//		reset_watchdog();
+}
+
+int isCharToSend(void)
+{
+
+//	return REG_Debug_CR1->TXEIE;
+//	LL_USART_EnableIT_TXE(USART1);
+	__HAL_UART_ENABLE_IT(&DEBUG_PORT_HANDLE, UART_IT_TXE);
+	return 0;	
+	
+}
+
+
+void Debug_printf( const char *format, ... )
+{
+	va_list args;
+	va_start(args, format);
+	uint8_t len=0;
+	char tempBuff[256];
+
+	//reset_watchdog();
+  	/*convert into string at buff[0] of length iw*/
+	len = tiny_vsnprintf_like(&tempBuff[0], sizeof(tempBuff), format, args); 
+//	reset_watchdog();
+	Debug_AddToWriteBuffer(tempBuff, len);
+	//Leave the flag set, and carry on, writing to the buffer will clear the flag for the next transmission.
+  	va_end(args);
+}
+
 
 /* USER CODE END 1 */
 

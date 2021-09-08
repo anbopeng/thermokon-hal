@@ -59,6 +59,7 @@
 extern DMA_HandleTypeDef hdma_usart4_rx;
 extern DMA_HandleTypeDef hdma_usart4_tx;
 extern UART_HandleTypeDef hlpuart1;
+extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart4;
 extern TIM_HandleTypeDef htim2;
 /* USER CODE BEGIN EV */
@@ -186,6 +187,20 @@ void TIM2_IRQHandler(void)
   /* USER CODE BEGIN TIM2_IRQn 1 */
 
   /* USER CODE END TIM2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
+  */
+void USART1_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART1_IRQn 0 */
+
+  /* USER CODE END USART1_IRQn 0 */
+  HAL_UART_IRQHandler(&huart1);
+  /* USER CODE BEGIN USART1_IRQn 1 */
+
+  /* USER CODE END USART1_IRQn 1 */
 }
 
 /**

@@ -43,3 +43,4 @@ thermokon_hal\main.o: ../Core/Inc/gpio.h
 thermokon_hal\main.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 thermokon_hal\main.o: ..\common\internal_flash_test.h
 thermokon_hal\main.o: ..\common\modbus_test.h
+thermokon_hal\main.o: ..\common\cli_process.h

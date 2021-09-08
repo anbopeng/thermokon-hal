@@ -37,13 +37,32 @@ extern UART_HandleTypeDef huart4;
 
 /* USER CODE BEGIN Private defines */
 
+extern int cliActive;
+//CLI
+#define RX_BUFFER_LENGTH 100
+#define TX_BUFFER_LENGTH 1024
+
+#define Debug_init() MX_USART1_UART_Init()
+
 /* USER CODE END Private defines */
 
 void MX_LPUART1_UART_Init(void);
 void MX_USART1_UART_Init(void);
 void MX_USART4_UART_Init(void);
 
+
 /* USER CODE BEGIN Prototypes */
+
+int Debug_cliActive(void);
+void Debug_disableCli(int disableRX);
+char Debug_getChar( void );
+int Debug_getRxDataLength(void);
+int isCharToSend(void);
+void await_uart_tx(void);
+void Debug_AddToWriteBuffer(char* message, int length);
+
+void Debug_printf( const char *format, ... );
+
 
 /* USER CODE END Prototypes */
 

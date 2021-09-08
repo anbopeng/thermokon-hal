@@ -337,9 +337,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_HAL_DRIVER,STM32L071xx</Define>
+              <Define>USE_HAL_DRIVER, STM32L071xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc; ../Drivers/STM32L0xx_HAL_Driver/Inc; ../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy; ../Drivers/CMSIS/Device/ST/STM32L0xx/Include; ../Drivers/CMSIS/Include; ..\common</IncludePath>
+              <IncludePath>../Core/Inc; ../Drivers/STM32L0xx_HAL_Driver/Inc; ../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy; ../Drivers/CMSIS/Device/ST/STM32L0xx/Include; ../Drivers/CMSIS/Include; ..\common; ..\SHELL</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -442,6 +442,16 @@
               <FileName>stm32l0xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32l0xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>tiny_sscanf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\tiny_sscanf.c</FilePath>
+            </File>
+            <File>
+              <FileName>tiny_vsnprintf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\tiny_vsnprintf.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -567,6 +577,36 @@
               <FileName>internal_flash_test.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\common\internal_flash_test.c</FilePath>
+            </File>
+            <File>
+              <FileName>cli_process.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\cli_process.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>shell</GroupName>
+          <Files>
+            <File>
+              <FileName>app_cli.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\SHELL\app_cli.c</FilePath>
+            </File>
+            <File>
+              <FileName>cli_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\SHELL\cli_led.c</FilePath>
+            </File>
+            <File>
+              <FileName>shell.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\SHELL\shell.c</FilePath>
+            </File>
+            <File>
+              <FileName>UsartShell.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\SHELL\UsartShell.c</FilePath>
             </File>
           </Files>
         </Group>

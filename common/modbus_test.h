@@ -27,6 +27,17 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+#define MAX_READ_PER_TRANSACTION 16
+#define PER_SUPPLY_ENABLE_PORT	GPIOB
+#define PER_SUPPLY_ENABLE_PIN	GPIO_PIN_5
+#define MAX_REPEAT_COUNT 5
+
+#define MODBUS_M1_PORT   		GPIOB
+#define MODBUS_M1_PIN    		GPIO_PIN_7
+
+#define MODBUS_M2_PORT   		GPIOB
+#define MODBUS_M2_PIN    		GPIO_PIN_2
+
 #define PACKED __attribute__((packed, aligned(1)))
 typedef struct
 {

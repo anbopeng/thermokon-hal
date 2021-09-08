@@ -35,3 +35,5 @@ thermokon_hal\usart.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_tim.h
 thermokon_hal\usart.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_tim_ex.h
 thermokon_hal\usart.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h
 thermokon_hal\usart.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart_ex.h
+thermokon_hal\usart.o: C:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h
+thermokon_hal\usart.o: ../Core/Inc/tiny_vsnprintf.h

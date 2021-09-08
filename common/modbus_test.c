@@ -23,23 +23,10 @@
 #include "stdio.h"
 
 
-#define MAX_READ_PER_TRANSACTION 16
-#define PER_SUPPLY_ENABLE_PORT	GPIOB
-#define PER_SUPPLY_ENABLE_PIN	GPIO_PIN_5
-#define MAX_REPEAT_COUNT 5
 
-#define MODBUS_M1_PORT   		GPIOB
-#define MODBUS_M1_PIN    		GPIO_PIN_7
-
-#define MODBUS_M2_PORT   		GPIOB
-#define MODBUS_M2_PIN    		GPIO_PIN_2
-
-
-
-static uint8_t rx_chr;
-static uint8_t rx_buffer[MAX_READ_PER_TRANSACTION] ={0};
-static uint8_t current_index = 0;
-
+uint8_t rx_chr;
+uint8_t modbus_rx_buffer[MAX_READ_PER_TRANSACTION] ={0};
+uint8_t current_index = 0;
 
 #define CRC_POLYNOMIAL 0x8005 //P(x)=x^16+x^15+x^2+1 = 1000 0000 0000 0101
 
@@ -60,17 +47,6 @@ uint8_t reflect_byte(uint8_t input)
 	return input;
 }
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{	
-	
-	if(huart->Instance == LPUART1)
-	{ 
-		
-		rx_buffer[current_index++] = rx_chr;
-		HAL_UART_Receive_IT(&hlpuart1, &rx_chr,1); // save char from uart receive
-	}
-
-}
 
 uint16_t modbus_calculateCrc(uint8_t* data, int data_length)
 {
@@ -159,12 +135,12 @@ int modbus_read_registers(modbus_register_t modbus_register)
 	{
 		for (int i =0; i < current_index; i++)
 		{
-			printf("%02x ",rx_buffer[i]);
+			printf("%02x ",modbus_rx_buffer[i]);
 		}
 		printf("\r\n");
-		crc = modbus_calculateCrc(rx_buffer, current_index-2);
+		crc = modbus_calculateCrc(modbus_rx_buffer, current_index-2);
 		printf("CRC:\r\n");
-		printf("Received:0x%02X%02X\r\n", rx_buffer[current_index-2], rx_buffer[current_index-1]);
+		printf("Received:0x%02X%02X\r\n", modbus_rx_buffer[current_index-2], modbus_rx_buffer[current_index-1]);
 		printf("Expected:0x%02X%02X\r\n", crc&0xFF, crc>>8);	
 		
 		return current_index;
@@ -222,7 +198,7 @@ void detect_thermokon_sensor(void)
     	
   }
 		
-	sensor_amount = rx_buffer[4];
+	sensor_amount = modbus_rx_buffer[4];
 
 	printf("You need to read %02d registers totally!\r\n", sensor_amount);
 
@@ -231,7 +207,7 @@ void detect_thermokon_sensor(void)
 
 		for (int i =0; i< sensor_amount; i ++)
 		{
-			clear_buffer(rx_buffer, MAX_READ_PER_TRANSACTION);
+			clear_buffer(modbus_rx_buffer, MAX_READ_PER_TRANSACTION);
 			current_index =0;
 			modbus_temp_reg.slaveID = 1;
 			modbus_temp_reg.function_code = 3;
@@ -248,7 +224,7 @@ void detect_thermokon_sensor(void)
 			}
 			    
 			//print_result(temp,MAX_READ_PER_TRANSACTION);
-			printf("Register %02d is %s!\r\n", rx_buffer[4],string_output(rx_buffer[4]));
+			printf("Register %02d is %s!\r\n", modbus_rx_buffer[4],string_output(modbus_rx_buffer[4]));
 		}
 
 	}
